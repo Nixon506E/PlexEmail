@@ -40,6 +40,10 @@ body {
     margin: 80px 0;
 }
 
+.featurette-divider:first-of-type {
+    margin: 0 !important;
+}
+
 .featurette {
     overflow: hidden;
 }
@@ -59,6 +63,7 @@ body {
 
 footer {
     margin: 50px 0;
+    text-align: center;
 }
 
 .info {
@@ -190,4 +195,44 @@ footer {
         margin-bottom: 10px;
         margin-left: 0;
     }
+}
+
+@media(max-width:767px) {
+	.headline {
+    	padding: 75px 0 75px 0 !important;
+	}
+	
+	.featurette {
+	    text-align: justify;
+    }
+    
+    .featurette > div {
+	    margin-left: 0 !important;
+    }
+    
+    .pull-left {
+    	float: none !important;
+	}
+	
+	.pull-right {
+    	float: none !important;
+	}
+	
+	.featurette-image {
+    	margin-right: auto !important;
+		margin-bottom: 30px !important;
+		margin-left: auto !important;
+	}
+	
+	.featurette-heading {
+		text-align: center;
+	}
+	
+	.subtitle {
+		text-align: center;
+	}
+	
+	.lead:first-of-type {
+		text-align: center;
+	}
 }

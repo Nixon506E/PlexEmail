@@ -25,16 +25,13 @@ from email.header import Header
 from email.utils import formataddr
 from xml.etree.ElementTree import XML
 
-SCRIPT_VERSION = 'v0.9.3'
+SCRIPT_VERSION = 'v0.9.0'
+
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 def replaceConfigTokens():
   ## The below code is for backwards compatibility
-  if ('filter_include_original_title' not in config):
-    config['filter_include_original_title'] = True
-    
-  if ('logging_enabled' not in config):
-    config['logging_enabled'] = True
-    
   if ('plex_web_server_guid' not in config):
     config['plex_web_server_guid'] = ''
     
@@ -294,9 +291,6 @@ def replaceConfigTokens():
     
   if (config['web_domain'] != '' and config['web_domain'].rfind('/') < len(config['web_domain']) - len('/')):
     config['web_domain'] = config['web_domain'] + '/'
-    
-  if (config['logging_file_location'].rfind(os.path.sep) < len(config['logging_file_location']) - len(os.path.sep)):
-    config['logging_file_location'] = config['logging_file_location'] + os.path.sep
   
     
 def convertToHumanReadable(valuesToConvert):
@@ -604,18 +598,70 @@ def createEmailHTML():
             <link rel="apple-touch-icon" sizes="144x144" href="images/icon_ipad@2x.png">
 
             <style>
+              .featurette-divider:first-of-type {
+              	margin: 0 !important;
+              }
+            
               .info {
-              border: 1px solid;
-              padding:15px 10px 15px 50px;
-              background-repeat: no-repeat;
-              background-position: 10px center;
-              color: #00529B;
-              background-color: #BDE5F8;
-              background-image: url('../images/info.png');
-              font-family:Arial, Helvetica, sans-serif; 
-              font-size:20px;
-              text-align: center;
-            }
+                border: 1px solid;
+                padding:15px 10px 15px 50px;
+                background-repeat: no-repeat;
+                background-position: 10px center;
+                color: #00529B;
+                background-color: #BDE5F8;
+                background-image: url('../images/info.png');
+                font-family:Arial, Helvetica, sans-serif; 
+                font-size:20px;
+                text-align: center;
+              }
+              
+              @media screen and (max-width:767px) {
+	            .row {
+		        	width: 100% !important;    
+		        }
+	              
+				.headline {
+			    	padding: 75px 0 75px 0 !important;
+				}
+				
+				.featurette {
+				    text-align: justify;
+			    }
+			    
+			    .lead {
+				    text-align: justify;
+			    }
+			    
+			    .featurette > div {
+				    margin-left: 0 !important;
+			    }
+			    
+			    .pull-left {
+			    	float: none !important;
+				}
+				
+				.pull-right {
+			    	float: none !important;
+				}
+				
+				.featurette-image {
+			    	margin-right: auto !important;
+					margin-bottom: 30px !important;
+					margin-left: auto !important;
+				}
+				
+				.featurette-heading {
+					text-align: center;
+				}
+				
+				.subtitle {
+					text-align: center;
+				}
+				
+				.lead:first-of-type {
+					text-align: center;
+				}
+			  }
             </style>
             <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
             <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -662,10 +708,10 @@ def createEmailHTML():
         
   emailText += """
             <!-- Footer -->
-            <footer>
+            <footer style="text-align: center">
                 <div class="row">
                     <div class="col-lg-12">
-                        <p>Copyright &copy; Jake Waldron 2015</p>
+                        <p>""" + config['msg_footer'] + """</p>
                     </div>
                 </div>
             </footer>
@@ -682,7 +728,7 @@ def createEmailHTML():
     </body>
 
     </html>"""
-    
+  
   return emailText
   
 def createWebHTML():
@@ -741,38 +787,38 @@ def createWebHTML():
   if (movieCount > 0 and config['filter_show_movies']):
     htmlText += """
                           <li>
-                              <a href="#movies-top">""" + config['msg_movies_link'] + """</a>
+                              <a href="#movies-top" data-toggle="collapse" data-target=".navbar-collapse.in">""" + config['msg_movies_link'] + """</a>
                           </li>"""
   if (showCount > 0 and config['filter_show_shows']):
     htmlText += """
                           <li>
-                              <a href="#shows-top">""" + config['msg_shows_link'] + """</a>
+                              <a href="#shows-top" data-toggle="collapse" data-target=".navbar-collapse.in">""" + config['msg_shows_link'] + """</a>
                           </li>"""
   if (seasonCount > 0 and config['filter_show_seasons']):
     htmlText += """
                           <li>
-                              <a href="#seasons-top">""" + config['msg_seasons_link'] + """</a>
+                              <a href="#seasons-top" data-toggle="collapse" data-target=".navbar-collapse.in">""" + config['msg_seasons_link'] + """</a>
                           </li>"""
   if (episodeCount > 0 and config['filter_show_episodes']):
     htmlText += """
                           <li>
-                              <a href="#episodes-top">""" + config['msg_episodes_link'] + """</a>
+                              <a href="#episodes-top" data-toggle="collapse" data-target=".navbar-collapse.in">""" + config['msg_episodes_link'] + """</a>
                           </li>"""
   
   if (artistCount > 0 and config['filter_show_artists']):
     htmlText += """
                           <li>
-                              <a href="#artists-top">""" + config['msg_artists_link'] + """</a>
+                              <a href="#artists-top" data-toggle="collapse" data-target=".navbar-collapse.in">""" + config['msg_artists_link'] + """</a>
                           </li>"""
   if (albumCount > 0 and config['filter_show_albums']):
     htmlText += """
                           <li>
-                              <a href="#albums-top">""" + config['msg_albums_link'] + """</a>
+                              <a href="#albums-top" data-toggle="collapse" data-target=".navbar-collapse.in">""" + config['msg_albums_link'] + """</a>
                           </li>"""
   if (songCount > 0 and config['filter_show_songs']):
     htmlText += """
                           <li>
-                              <a href="#songs-top">""" + config['msg_songs_link'] + """</a>
+                              <a href="#songs-top" data-toggle="collapse" data-target=".navbar-collapse.in">""" + config['msg_songs_link'] + """</a>
                           </li>"""
                           
   htmlText += """
@@ -872,25 +918,21 @@ if (not os.path.isfile(configFile)):
 config = {}
 execfile(configFile, config)
 replaceConfigTokens()
+  
+numeric_level = getattr(logging, config['logging_debug_level'], None)
+file_mode = 'a' if (config['logging_retain_previous_logs']) else 'w'
+if not isinstance(numeric_level, int):
+  numeric_level = getattr(logging, 'INFO')
+if not os.path.exists(os.path.dirname(os.path.realpath(sys.argv[0])) + os.path.sep + 'logs'):
+    os.makedirs(os.path.dirname(os.path.realpath(sys.argv[0])) + os.path.sep + 'logs')
+logging.basicConfig(level=numeric_level, format='%(asctime)s - %(levelname)s:%(message)s', filename=os.path.dirname(os.path.realpath(sys.argv[0])) + os.path.sep + 'logs' + os.path.sep + 'plexEmail.log', filemode=file_mode)
 
-if (config['logging_enabled']):
-  numeric_level = getattr(logging, config['logging_debug_level'], None)
-  file_mode = 'a' if (config['logging_retain_previous_logs']) else 'w'
-  if not isinstance(numeric_level, int):
-    numeric_level = getattr(logging, 'INFO')
-  if (config['logging_file_location'] != ''):
-    logging.basicConfig(level=numeric_level, format='%(asctime)s - %(levelname)s:%(message)s', filename=config['logging_file_location'] + 'plexEmail.log', filemode=file_mode)
-  else:
-    if not os.path.exists(os.path.dirname(os.path.realpath(sys.argv[0])) + os.path.sep + 'logs'):
-        os.makedirs(os.path.dirname(os.path.realpath(sys.argv[0])) + os.path.sep + 'logs')
-    logging.basicConfig(level=numeric_level, format='%(asctime)s - %(levelname)s:%(message)s', filename=os.path.dirname(os.path.realpath(sys.argv[0])) + os.path.sep + 'logs' + os.path.sep + 'plexEmail.log', filemode=file_mode)
-
-  sys.excepthook = exceptionHandler
+sys.excepthook = exceptionHandler
 
 testMode = False
 
 if ('test' in args):
-  logging.info('Test flag is set to ' + str(args['test']))
+  logging.info('Test flag found - setting script instance to test mode.')
   testMode = args['test']
 else:
   logging.info('Test flag not found.')
@@ -912,8 +954,8 @@ if ('upload_use_cloudinary' in config and config['upload_use_cloudinary']):
 plexWebLink = ''
 
 if (config['filter_include_plex_web_link']):
-  if (config['plex_web_server_guid'] != ''):
-    plexWebLink = 'http://plex.tv/web/app#!/server/' + config['plex_web_server_guid'] + '/details?key=%2Flibrary%2Fmetadata%2F'
+  if (config['plex_web_server_guid'] == ''):
+    plexWebLink = 'http://plex.tv/web/app#!/server/' + config['plex_web_server_guid'] + '/details/%2Flibrary%2Fmetadata%2F'
   else:
     logging.info('Including Plex Web Link - Getting machine identifier from the DLNA DB')
     DLNA_DB_FILE = config['plex_data_folder'] + 'Plex Media Server' + os.path.sep + 'Plug-in Support' + os.path.sep + 'Databases' + os.path.sep + 'com.plexapp.dlna.db'
@@ -921,17 +963,12 @@ if (config['filter_include_plex_web_link']):
     
     if (os.path.isfile(DLNA_DB_FILE)):
       try:
-        shutil.copyfile(DLNA_DB_FILE, DLNA_DB_FILE + '_plexemail')
-        con = sqlite3.connect(DLNA_DB_FILE + '_plexemail')
+        con = sqlite3.connect(DLNA_DB_FILE)
         cur = con.cursor()    
         cur.execute('SELECT machine_identifier FROM remote_servers WHERE url LIKE "http://127.0.0.1%";')
         for row in cur:
-          plexWebLink = 'http://plex.tv/web/app#!/server/' + row[0] + '/details?key=%2Flibrary%2Fmetadata%2F'
+          plexWebLink = 'http://plex.tv/web/app#!/server/' + row[0] + '/details/%2Flibrary%2Fmetadata%2F'
           logging.info('plexWebLink = ' + plexWebLink)
-        cur.close()
-        del cur
-        con.close()
-        os.remove(DLNA_DB_FILE + '_plexemail')
       except sqlite3.OperationalError:
         logging.warning(DLNA_DB_FILE + ' is locked or does not have the correct permissions')
     else:
@@ -944,8 +981,7 @@ if (not os.path.isfile(DATABASE_FILE)):
   print DATABASE_FILE + ' does not exist. Please make sure the plex_data_folder value is correct.'
   sys.exit()
   
-shutil.copyfile(DATABASE_FILE, DATABASE_FILE + '_plexemail')
-con = sqlite3.connect(DATABASE_FILE + '_plexemail')
+con = sqlite3.connect(DATABASE_FILE)
 con.text_factory = str
 
 with con:
@@ -965,9 +1001,6 @@ with con:
         libraryFilter += ') '
       logging.debug('libraryFilter = ' + libraryFilter)
       
-      cur.close()
-      del cur
-      
     dateSearch = 'datetime(\'now\', \'localtime\', \'-' + str(config['date_days_back_to_search']) + ' days\', \'-' + str(config['date_hours_back_to_search']) + ' hours\', \'-' + str(config['date_minutes_back_to_search']) + ' minutes\')'
     logging.debug('dateSearch for DB query = ' + dateSearch)
 
@@ -982,62 +1015,66 @@ with con:
       response[row[0]] = {'id': row[0], 'parent_id': row[1], 'metadata_type': row[2], 'title': row[3], 'title_sort': row[4], 'original_title': row[5], 'rating': row[6], 'tagline': row[7], 'summary': row[8], 'content_rating': row[9], 'duration': row[10], 'user_thumb_url': row[11], 'tags_genre': row[12], 'tags_director': row[13], 'tags_star': row[14], 'year': row[15], 'hash': row[16], 'index': row[17], 'studio': row[18], 'real_duration': row[19], 'air_date': row[20]}
       logging.debug(response[row[0]])    
     
-    cur.close()
-    del cur
-    
     emailNotice = ''
     htmlNotice = ''
     if (config['msg_notice']):
       logging.info('Generating html for the notice: ' + config['msg_notice'])
       emailNotice = """<br/>&nbsp;<div style="border: 1px solid; padding:15px 0px 15px 0px; background-repeat: no-repeat; background-position: 10px center; color: #00529B; background-color: #BDE5F8;font-family:Arial, Helvetica, sans-serif; font-size:20px; text-align: center;">""" + config['msg_notice'] + """</div><br/>&nbsp;"""
       htmlNotice = """<div class="container"><hr class="featurette-divider"><div class="info">""" + config['msg_notice'] + """</div>"""
-    emailMovies = """<div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    emailMovies = """<hr class="featurette-divider" id="movies-top">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h1 style="width: 100%; text-align: center; background: #FFF !important;"><font style="color: #F9AA03;">""" + config['msg_new_movies_header'] + """</font></h1>
-        </div><hr class="featurette-divider" id="movies-top"><br/>&nbsp;"""
+        </div>"""
     htmlMovies = """<hr class="featurette-divider" id="movies-top">
-    <div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h2 style="width: 100%; text-align: center; background: #FFF !important; color: #F9AA03 !important;">""" + config['msg_new_movies_header'] + """</h2>
         </div>"""
-    emailTVShows = """<div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    emailTVShows = """<hr class="featurette-divider" id="shows-top">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h1 style="width: 100%; text-align: center; background: #FFF !important;"><font style="color: #F9AA03;">""" + config['msg_new_shows_header'] + """</font></h1>
-        </div><hr class="featurette-divider" id="shows-top"><br/>&nbsp;"""
+        </div>"""
     htmlTVShows = """<hr class="featurette-divider" id="shows-top">
-    <div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h2 style="width: 100%; text-align: center; background: #FFF !important; color: #F9AA03 !important;">""" + config['msg_new_shows_header'] + """</h2>
         </div>"""
-    emailTVSeasons = """<div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    emailTVSeasons = """<hr class="featurette-divider" id="seasons-top">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h1 style="width: 100%; text-align: center; background: #FFF !important;"><font style="color: #F9AA03;">""" + config['msg_new_seasons_header'] + """</font></h1>
-        </div><hr class="featurette-divider" id="seasons-top"><br/>&nbsp;"""
+        </div>"""
     htmlTVSeasons = """<hr class="featurette-divider" id="seasons-top">
-    <div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h2 style="width: 100%; text-align: center; background: #FFF !important; color: #F9AA03 !important;">""" + config['msg_new_seasons_header'] + """</h2>
         </div>"""
-    emailTVEpisodes = """<div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    emailTVEpisodes = """<hr class="featurette-divider" id="episodes-top">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h1 style="width: 100%; text-align: center; background: #FFF !important;"><font style="color: #F9AA03;">""" + config['msg_new_episodes_header'] + """</font></h1>
-        </div><hr class="featurette-divider" id="episodes-top"><br/>&nbsp;"""
+        </div>"""
     htmlTVEpisodes = """<hr class="featurette-divider" id="episodes-top">
-    <div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h2 style="width: 100%; text-align: center; background: #FFF !important; color: #F9AA03 !important;">""" + config['msg_new_episodes_header'] + """</h2>
         </div>"""
-    emailArtists = """<div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    emailArtists = """<hr class="featurette-divider" id="artists-top">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h1 style="width: 100%; text-align: center; background: #FFF !important;"><font style="color: #F9AA03;">""" + config['msg_new_artists_header'] + """</font></h1>
-        </div><hr class="featurette-divider" id="artists-top"><br/>&nbsp;"""
+        </div>"""
     htmlArtists = """<hr class="featurette-divider" id="artists-top">
-    <div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h2 style="width: 100%; text-align: center; background: #FFF !important; color: #F9AA03 !important;">""" + config['msg_new_artists_header'] + """</h2>
         </div>"""
-    emailAlbums = """<div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    emailAlbums = """<hr class="featurette-divider" id="albums-top">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h1 style="width: 100%; text-align: center; background: #FFF !important;"><font style="color: #F9AA03;">""" + config['msg_new_albums_header'] + """</font></h1>
-        </div><hr class="featurette-divider" id="albums-top"><br/>&nbsp;"""
+        </div>"""
     htmlAlbums= """<hr class="featurette-divider" id="albums-top">
-    <div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h2 style="width: 100%; text-align: center; background: #FFF !important; color: #F9AA03 !important;">""" + config['msg_new_albums_header'] + """</h2>
         </div>"""
-    emailSongs = """<div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    emailSongs = """<hr class="featurette-divider" id="songs-top">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h1 style="width: 100%; text-align: center; background: #FFF !important;"><font style="color: #F9AA03;">""" + config['msg_new_songs_header'] + """</font></h1>
-        </div><hr class="featurette-divider" id="songs-top"><br/>&nbsp;"""
+        </div>"""
     htmlSongs = """<hr class="featurette-divider" id="songs-top">
-    <div class="headline" style="background: #FFF !important; padding-top: 0px !important;">
+    <div class="headline" style="background: #FFF !important; padding-top: 60px !important;">
           <h2 style="width: 100%; text-align: center; background: #FFF !important; color: #F9AA03 !important;">""" + config['msg_new_songs_header'] + """</h2>
         </div>"""
     movies = {}
@@ -1092,7 +1129,7 @@ with con:
     for movie in movies:
       movies[movie] = convertToHumanReadable(movies[movie])
       title = ''
-      if (config['filter_include_original_title'] and 'original_title' in movies[movie] and movies[movie]['original_title'] != ''):
+      if ('original_title' in movies[movie] and movies[movie]['original_title'] != ''):
         title += movies[movie]['original_title'] + ' AKA '
       title += movies[movie]['title']
       hash = str(movies[movie]['hash'])
@@ -1108,12 +1145,13 @@ with con:
       else:
         pwLink = ''
       
-      emailText += '<table><tr width="100%">'
+      emailText += '<table style="margin: 0 auto;width:100%;"><tr><td>'
       if (config['filter_show_email_images']):
-        emailText += '<td width="200">'
+        emailText += '<table class="row" style="float:left;width:20%;"><tr><td class="row-text" style="padding: 10px;text-align:center;">'
         emailText += '<a target="_blank" href="' + pwLink + '"><img class="featurette-image img-responsive pull-left" src="' + imageInfo['emailImgPath'].decode('utf-8') +'" width="154"></a>'
-        emailText += '</td>'
-      emailText += '<td><h2 class="featurette-heading"><a target="_blank" style="color: #000000;" href="' + pwLink + '">' + title.decode('utf-8') + '</a></h2>'
+        emailText += '</td></tr></table>'
+      emailText += '<table class="row" style="float:left;width:70%;"><tr><td class="row-text" style="padding: 10px;">'
+      emailText += '<h2 class="featurette-heading"><a target="_blank" style="color: #000000;" href="' + pwLink + '">' + title.decode('utf-8') + '</a></h2>'
       htmlText += '<div class="featurette" id="movies">'
       htmlText += '<a target="_blank" href="' + pwLink + '"><img class="featurette-image img-responsive pull-left" src="' + imageInfo['webImgPath'].decode('utf-8') + '" width="154px" height="218px"></a>'
       htmlText += '<div style="margin-left: 200px;"><h2 class="featurette-heading"><a target="_blank" style="color: #000000;" href="' + pwLink + '">' + title.decode('utf-8') + '</a></h2>'
@@ -1129,7 +1167,7 @@ with con:
           emailText += '<p class="lead">' + sections[section[0]]['preText'].decode('utf-8') + displayText.decode('utf-8') + sections[section[0]]['postText'].decode('utf-8') + '</p>'
           htmlText += '<p class="lead">' + sections[section[0]]['preText'].decode('utf-8') + displayText.decode('utf-8') + sections[section[0]]['postText'].decode('utf-8') + '</p>'
       
-      emailText += '</td></tr></table><br/>&nbsp;<br/>&nbsp;'
+      emailText += '</td></tr></table></td></tr></table><br/>&nbsp;<br/>&nbsp;'
       htmlText += '</div></div><br/>&nbsp;<br/>&nbsp;'
       
       titleFilter = []
@@ -1152,7 +1190,7 @@ with con:
     for show in tvShows:
       tvShows[show] = convertToHumanReadable(tvShows[show])
       title = ''
-      if (config['filter_include_original_title'] and 'original_title' in tvShows[show] and tvShows[show]['original_title'] != ''):
+      if (tvShows[show]['original_title'] != ''):
         title += tvShows[show]['original_title'] + ' AKA '
       title += tvShows[show]['title']
       hash = str(tvShows[show]['hash'])
@@ -1168,10 +1206,13 @@ with con:
       else:
         pwLink = ''
       
-      emailText += '<table><tr width="100%">'
+      emailText += '<table style="margin: 0 auto;width:100%;"><tr><td>'
       if (config['filter_show_email_images']):
-        emailText += '<td width="200"><a target="_blank" href="' + pwLink + '"><img class="featurette-image img-responsive pull-left" src="' + imageInfo['emailImgPath'].decode('utf-8') +'" width="154"></a></td>'
-      emailText += '<td><h2 class="featurette-heading"><a target="_blank" style="color: #000000;" href="' + pwLink + '">' + title.decode('utf-8') + '</a></h2>'
+        emailText += '<table class="row" style="float:left;width:20%;"><tr><td class="row-text" style="padding: 10px;text-align:center;">'
+        emailText += '<a target="_blank" href="' + pwLink + '"><img class="featurette-image img-responsive pull-left" src="' + imageInfo['emailImgPath'].decode('utf-8') + '" width="154"></a>'
+        emailText += '</td></tr></table>'
+      emailText += '<table class="row" style="float:left;width:70%;"><tr><td class="row-text" style="padding: 10px;">'
+      emailText += '<h2 class="featurette-heading"><a target="_blank" style="color: #000000;" href="' + pwLink + '">' + title.decode('utf-8') + '</a></h2>'
       htmlText += '<div class="featurette" id="shows">'
       htmlText += '<a target="_blank" href="' + pwLink + '"><img class="featurette-image img-responsive pull-left" src="' + imageInfo['webImgPath'].decode('utf-8') + '" width="154px" height="218px"></a>'
       htmlText += '<div style="margin-left: 200px;"><h2 class="featurette-heading"><a target="_blank" style="color: #000000;" href="' + pwLink + '">' + title.decode('utf-8') + '</a></h2>'
@@ -1187,7 +1228,7 @@ with con:
           emailText += '<p class="lead">' + sections[section[0]]['preText'].decode('utf-8') + displayText.decode('utf-8') + sections[section[0]]['postText'].decode('utf-8') + '</p>'
           htmlText += '<p class="lead">' + sections[section[0]]['preText'].decode('utf-8') + displayText.decode('utf-8') + sections[section[0]]['postText'].decode('utf-8') + '</p>'
       
-      emailText += '</td></tr></table><br/>&nbsp;<br/>&nbsp;'
+      emailText += '</td></tr></table></td></tr></table><br/>&nbsp;<br/>&nbsp;'
       htmlText += '</div></div><br/>&nbsp;<br/>&nbsp;'
       
       titleFilter = []
@@ -1220,9 +1261,6 @@ with con:
         tvSeasons[season]['parent_hash'] = row[12]
         tvSeasons[season]['parent_thumb_url'] = row[13]
         tvSeasons[season]['studio'] = row[14]
-        
-      cur2.close()
-      del cur2
           
     if ('season_sort_3' in config and config['season_sort_3'] != ''):
       tvSeasons = OrderedDict(sorted(tvSeasons.iteritems(), key=lambda t: t[1][config['season_sort_3']], reverse=config['season_sort_3_reverse']))
@@ -1234,7 +1272,7 @@ with con:
     for season in tvSeasons:
       tvSeasons[season] = convertToHumanReadable(tvSeasons[season])
       title = ''
-      if (config['filter_include_original_title'] and 'original_title' in tvSeasons[season] and tvSeasons[season]['original_title'] != ''):
+      if (tvSeasons[season]['original_title'] != ''):
         title += tvSeasons[season]['original_title'] + ' AKA '
       title += tvSeasons[season]['title']
       imageInfo = {}
@@ -1255,10 +1293,13 @@ with con:
       else:
         pwLink = ''
       
-      emailText += '<table><tr width="100%">'
-      if (config['filter_show_email_images']):
-        emailText += '<td width="200"><a target="_blank" href="' + pwLink + '"><img class="featurette-image img-responsive pull-left" src="' + imageInfo['emailImgPath'].decode('utf-8') +'" width="154"></a></td>'
-      emailText += '<td><h2 class="featurette-heading"><a target="_blank" style="color: #000000;" href="' + pwLink + '">' + title.decode('utf-8') + '</a></h2>'
+      emailText += '<table style="margin: 0 auto;width:100%;"><tr><td>'
+      if (config['filter_show_email_images'] and len(imageInfo) != 0):
+        emailText += '<table class="row" style="float:left;width:20%;"><tr><td class="row-text" style="padding: 10px;text-align:center;">'
+        emailText += '<a target="_blank" href="' + pwLink + '"><img class="featurette-image img-responsive pull-left" src="' + imageInfo['emailImgPath'].decode('utf-8') +'" width="154"></a></td>'
+        emailText += '</td></tr></table>'
+      emailText += '<table class="row" style="float:left;width:70%;"><tr><td class="row-text" style="padding: 10px;">'
+      emailText += '<h2 class="featurette-heading"><a target="_blank" style="color: #000000;" href="' + pwLink + '">' + title.decode('utf-8') + '</a></h2>'
       emailText += '<p class="lead"><b>Season ' + str(tvSeasons[season]['index']) + '</b></p>'
       htmlText += '<div class="featurette" id="shows">'
       htmlText += '<a target="_blank" href="' + pwLink + '"><img class="featurette-image img-responsive pull-left" src="' + imageInfo['webImgPath'].decode('utf-8') + '" width="154px" height="218px"></a>'
@@ -1276,7 +1317,7 @@ with con:
           emailText += '<p class="lead">' + sections[section[0]]['preText'].decode('utf-8') + displayText.decode('utf-8') + sections[section[0]]['postText'].decode('utf-8') + '</p>'
           htmlText += '<p class="lead">' + sections[section[0]]['preText'].decode('utf-8') + displayText.decode('utf-8') + sections[section[0]]['postText'].decode('utf-8') + '</p>'
       
-      emailText += '</td></tr></table><br/>&nbsp;<br/>&nbsp;'
+      emailText += '</td></tr></table></td></tr></table><br/>&nbsp;<br/>&nbsp;'
       htmlText += '</div></div><br/>&nbsp;<br/>&nbsp;'
       
       titleFilter = []
@@ -1322,15 +1363,9 @@ with con:
             tvEpisodes[episode]['show_thumb_url'] = row2[8]
             logging.debug('main: show_thumb_url = ' + row2[8])
             tvEpisodes[episode]['studio'] = row2[9]
-            
-          cur3.close()
-          del cur3
       else:
         logging.info('main: tvEpisodes[episode][\'parent_id\'] = None')
         del modifiedTVEpisodes[episode]
-        
-      cur2.close()
-      del cur2
         
     tvEpisodes = dict(modifiedTVEpisodes)
           
@@ -1345,11 +1380,11 @@ with con:
       if (tvEpisodes[episode]['parent_id'] not in tvSeasons):
         tvEpisodes[episode] = convertToHumanReadable(tvEpisodes[episode])
         showTitle = ''
-        if (config['filter_include_original_title'] and 'original_title' in tvEpisodes[episode] and tvEpisodes[episode]['show_original_title'] != ''):
+        if (tvEpisodes[episode]['show_original_title'] != ''):
           showTitle += tvEpisodes[episode]['show_original_title'] + ' AKA '
         showTitle += tvEpisodes[episode]['show_title']
         title = ''
-        if (config['filter_include_original_title'] and 'original_title' in tvEpisodes[episode] and tvEpisodes[episode]['original_title'] != ''):
+        if (tvEpisodes[episode]['original_title'] != ''):
           title += tvEpisodes[episode]['original_title'] + ' AKA '
         title += tvEpisodes[episode]['title']
         imageInfo = {}
@@ -1376,11 +1411,14 @@ with con:
         else:
           pwLink = ''
       
-        emailText += '<table><tr width="100%">'
+        emailText += '<table style="margin: 0 auto;width:100%;"><tr><td>'
         if (config['filter_show_email_images'] and len(imageInfo) != 0):
-          emailText += '<td width="200"><a target="_blank" href="' + pwLink + '"><img class="featurette-image img-responsive pull-left" src="' + imageInfo['emailImgPath'].decode('utf-8') +'" width="154"></a></td>'
-        emailText += '<td><h2 class="featurette-heading"><a target="_blank" style="color: #000000;" href="' + pwLink + '">' + showTitle.decode('utf-8') + '</a></h2>'
-        emailText += '<p class="lead"><i>S' + str(tvEpisodes[episode]['season_index']) + ' E' + str(tvEpisodes[episode]['index']) + ': ' + title.decode('utf-8') + '</i></p>'
+          emailText += '<table class="row" style="float:left;width:20%;"><tr><td class="row-text" style="padding: 10px;text-align:center;">'
+          emailText += '<a target="_blank" href="' + pwLink + '"><img class="featurette-image img-responsive pull-left" src="' + imageInfo['emailImgPath'].decode('utf-8') +'" width="154"></a></td>'
+          emailText += '</td></tr></table>'
+        emailText += '<table class="row" style="float:left;width:70%;"><tr><td class="row-text" style="padding: 10px;">'
+        emailText += '<h2 class="featurette-heading"><a target="_blank" style="color: #000000;" href="' + pwLink + '">' + showTitle.decode('utf-8') + '</a></h2>'
+        emailText += '<p class="subtitle lead"><i>S' + str(tvEpisodes[episode]['season_index']) + ' E' + str(tvEpisodes[episode]['index']) + ': ' + title.decode('utf-8') + '</i></p>'
         htmlText += '<div class="featurette" id="shows">'
         if (len(imageInfo) != 0):
           htmlText += '<a target="_blank" href="' + pwLink + '"><img class="featurette-image img-responsive pull-left" src="' + imageInfo['webImgPath'].decode('utf-8') + '" width="154px" height="218px"></a>'
@@ -1398,7 +1436,7 @@ with con:
             emailText += '<p class="lead">' + sections[section[0]]['preText'].decode('utf-8') + displayText.decode('utf-8') + sections[section[0]]['postText'].decode('utf-8') + '</p>'
             htmlText += '<p class="lead">' + sections[section[0]]['preText'].decode('utf-8') + displayText.decode('utf-8') + sections[section[0]]['postText'].decode('utf-8') + '</p>'
         
-        emailText += '</td></tr></table><br/>&nbsp;<br/>&nbsp;'
+        emailText += '</td></tr></table></td></tr></table><br/>&nbsp;<br/>&nbsp;'
         htmlText += '</div></div><br/>&nbsp;<br/>&nbsp;'
         
         titleFilter = []
@@ -1421,7 +1459,7 @@ with con:
     for artist in artists:
       artists[artist] = convertToHumanReadable(artists[artist])
       title = ''
-      if (config['filter_include_original_title'] and 'original_title' in artists[artist] and artists[artist]['original_title'] != ''):
+      if (artists[artist]['original_title'] != ''):
         title += artists[artist]['original_title'] + ' AKA '
       title += artists[artist]['title']
       hash = str(artists[artist]['hash'])
@@ -1491,9 +1529,6 @@ with con:
         albums[album]['parent_thumb_url'] = row[13]
         albums[album]['studio'] = row[14]
         
-      cur2.close()
-      del cur2
-        
       cur2 = con.cursor()
       cur2.execute("SELECT MD.id, MD.title, MD.title_sort, MD.original_title, MD.[index], ME.duration, ME.audio_codec FROM metadata_items MD LEFT OUTER JOIN media_items ME ON MD.id = ME.metadata_item_id WHERE parent_id = " + str(albums[album]['id']) + ";")
       
@@ -1512,9 +1547,7 @@ with con:
         except TypeError:
           duration = 'N/A'
         albums[album]['tracks'][row[4]] = {'id': row[0], 'title': row[1], 'title_sort': row[2], 'original_title': row[3], 'index': row[4], 'duration': duration, 'codec': row[6]}
-      
-      cur2.close()
-      del cur2
+          
     if ('album_sort_3' in config and config['album_sort_3'] != ''):
       albums = OrderedDict(sorted(albums.iteritems(), key=lambda t: t[1][config['album_sort_3']], reverse=config['album_sort_3_reverse']))
     if ('album_sort_2' in config and config['album_sort_2'] != ''):
@@ -1525,7 +1558,7 @@ with con:
     for album in albums:
       albums[album] = convertToHumanReadable(albums[album])
       title = ''
-      if (config['filter_include_original_title'] and 'original_title' in albums[album] and albums[album]['original_title'] != ''):
+      if (albums[album]['original_title'] != ''):
         title += albums[album]['original_title'] + ' AKA '
       title += albums[album]['title']
       imageInfo = {}
@@ -1740,6 +1773,3 @@ with con:
       print 'Emails were not sent because the option is disabled in the config file.'
     else:
       print 'Emails were not sent because there were no new additions in the timeframe specified.'
-
-con.close()
-os.remove(DATABASE_FILE + '_plexemail')
